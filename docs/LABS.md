@@ -1,12 +1,12 @@
 # First three hands-on labs
 
-Complete [setup](SETUP.md) first. Run only against your disposable lab copies.
+Complete [setup](SETUP.md) first. Run only against the designated training repository or disposable copies.
 Fixed workflows are intentionally not supplied: explain the remediation during
 the workshop, and let participants implement it themselves if time permits.
 
 ## Lab 01: Understand a pipeline (15 minutes)
 
-1. Alice pushes the starter repository to `main`.
+1. View the instructor's existing pipeline run, or push the starter repository to `main` in your own fork.
 2. Open **Actions > Lab 01 - Pipeline basics** and inspect the run.
 3. Identify the trigger, the two jobs, the `needs` dependency, runner type, checkout
    action, and commands in each step.
@@ -21,8 +21,9 @@ an action (`uses`) from a shell command (`run`).
 
 ## Lab 02: PR-title script injection (25 minutes)
 
-Alice sets `LAB02_ENABLED=true` and `LAB_ATTACKER` to Bob's username. Keep Lab 03
-disabled for this exercise.
+No activation variables are needed. In the shared setup, Alice's base repository
+below is `actions-security-playground/actions-security-lab`, and Bob is the
+participant. Both vulnerable workflows may run on the same PR.
 
 1. Bob creates a branch in Bob's fork and makes a harmless README change.
 2. Bob opens a PR to Alice's base repository titled `lab-02: hello`.
@@ -45,12 +46,13 @@ disabled for this exercise.
 Success: Bob makes an extra command execute by changing metadata, without changing
 the base workflow. Do not run destructive commands, network requests, or secret reads.
 
-Cleanup: Alice sets `LAB02_ENABLED=false` and closes the PR.
+Cleanup: close the exercise PR. The instructor disables the vulnerable workflows
+in the Actions UI after the workshop.
 
 ## Lab 03: Pwn request (30 minutes)
 
-Alice sets `LAB03_ENABLED=true`, confirms `LAB_ATTACKER` is Bob, and adds only the
-dummy `LAB_SECRET` described in setup. Keep Lab 02 disabled.
+The instructor adds only the dummy `LAB_SECRET` described in setup to the base
+repository. There are no owner, actor or title checks.
 
 1. Bob creates a fresh branch from the starter version in Bob's fork.
 2. Change **only** `scripts/lab-test.sh`, adding the following before the test command:
@@ -63,8 +65,9 @@ dummy `LAB_SECRET` described in setup. Keep Lab 02 disabled.
    fi
    ```
 
-3. Commit the script change and open a fork PR to Alice titled
-   `lab-03: demonstrate the trust boundary`.
+3. Commit the script change and open a fork PR to the base repository titled
+   `lab-03: demonstrate the trust boundary`. The title is an organizational label,
+   not a workflow filter.
 4. Inspect **Lab 03 - Pwn request (VULNERABLE)**. The final step should emit
    `LAB_SECRET_ACCESS_CONFIRMED`, followed by passing unit tests. The dummy secret's
    value must never be printed.
@@ -87,16 +90,16 @@ demonstration, not real credential exfiltration or proof of write permissions.
 If GitHub policy blocks the event, record that outcome and discuss the policy.
 Do not disable protected workflows or weaken organization policy to force a run.
 
-Cleanup: set `LAB03_ENABLED=false`, close the PR, cancel remaining runs, and remove
-the dummy secret. Follow the full cleanup checklist in [setup](SETUP.md).
+Cleanup: close the PR. After the workshop, the instructor disables the vulnerable
+workflows, cancels remaining runs, and removes the dummy secret. Follow the full
+cleanup checklist in [setup](SETUP.md).
 
 ## Common problems
 
 | Symptom | Check |
 | --- | --- |
-| Vulnerable job is skipped | Repository owner, exact enable value `true`, `LAB_ATTACKER`, event actor, title prefix |
-| Lab 03 is skipped | Bob's PR must originate from a fork |
-| Dummy-secret check fails | `LAB_SECRET` must exist in Alice's base repository, not Bob's fork |
+| Workflow does not run | Check that the workflow is enabled and the event is supported |
+| Marker prints `NO_LAB_SECRET` | Add the dummy `LAB_SECRET` to the base repository, not the participant's fork |
 | Workflow blocked before any steps | Applicable Actions event policy or Actions permissions; ask the instructor |
-| No standalone marker after editing title | Bob must perform the edit; inspect the new run rather than the old one |
+| No standalone marker after editing title | Inspect the new Lab 02 run; its trigger includes `edited` |
 | Lab 01 tests fail unexpectedly | Restore `add()` and inspect the changed test script |

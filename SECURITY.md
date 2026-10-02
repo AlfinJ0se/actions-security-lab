@@ -1,27 +1,24 @@
-# Training security boundary
+# Training warning
 
 This repository intentionally contains vulnerable GitHub Actions workflows.
-They are educational examples, not production templates.
+They have no activation guards and are not production templates.
 
-- Do not enable the vulnerable labs in `actions-security-playground`.
-- Use fresh participant-owned copies and an agreed workshop partner.
-- Use GitHub-hosted ephemeral runners, never a company self-hosted runner.
-- Add only the explicit dummy `LAB_SECRET`; never use real credentials, inherited
-  organization secrets, environment secrets, deployments, or production access.
-- Do not raise `GITHUB_TOKEN` permissions. Lab 03 needs only `contents: read`.
-- Do not share PATs or expose GitHub's actual job token in logs or artifacts.
-- Markers are the only proof-of-execution payloads in these exercises. No external
-  callbacks, persistence, destructive commands, or secret-value logging.
-- Repository-variable gates and an actor check limit accidental activation. They
-  are not a sandbox and do not make an intentionally vulnerable workflow secure.
-- Leave workflow/event policies intact. Stop if a protected policy blocks a lab.
-- Disable the lab and cancel running jobs before cleanup. Remove the dummy secret
-  and archive or delete disposable copies afterwards.
+- Public PR authors can trigger the workflows on the configured events, subject
+  to applicable GitHub policies. There is no participant allowlist.
+- Use only this dedicated training repository or disposable copies.
+- Use GitHub-hosted ephemeral runners, never company self-hosted runners.
+- Add only the dummy `LAB_SECRET`. Never attach real credentials, inherited
+  organization secrets, environment secrets, deployments or production access.
+- Keep the explicit token permissions unchanged; no write permissions are needed.
+- Use only harmless execution markers. Do not print secret values, expose actual
+  GitHub tokens, send external callbacks or run destructive commands.
+- Leave event policies intact. If a policy blocks an exercise, stop and ask the
+  instructor to review the approved lab environment.
+- Disable vulnerable workflows in the Actions UI, cancel running jobs and remove
+  the dummy secret when the workshop ends. Closing a PR alone does not disable
+  the workflow for future PRs.
 
 The `pull_request_target` workflow definition comes from the base repository.
-Explicitly checking out a PR's head and then executing it can cross the trust
-boundary. Lab 03 uses a historical checkout pin to reproduce that legacy pattern;
-newer checkout releases and GitHub policies provide additional protections.
-
-The maintained instructor repository must retain the organization exclusion in
-both vulnerable jobs. Avoid adding any real secret to this organization or repo.
+Lab 03 explicitly checks out the PR head and executes its script in a step with
+the dummy secret. It uses a historical checkout pin to demonstrate the legacy
+pattern; modern checkout versions and GitHub policies add protections.
