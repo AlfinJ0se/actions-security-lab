@@ -1,5 +1,5 @@
 # INTENTIONALLY VULNERABLE: training only. Use dummy secrets.
-name: "Lab 03 - Pwn request (VULNERABLE)"
+name: "Lab 03"
 
 on:
   pull_request_target:
