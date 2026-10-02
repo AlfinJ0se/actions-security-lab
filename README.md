@@ -1,5 +1,5 @@
 # actions-security-lab
-Github actions security lab
+Github actions security lab 1
 
 Hands-on exercises for **Securing GitHub Actions Across the Enterprise**.
 
