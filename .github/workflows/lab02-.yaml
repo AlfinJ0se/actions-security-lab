@@ -1,5 +1,5 @@
 # INTENTIONALLY VULNERABLE: training only.
-name: "Lab 02 - Script injection (VULNERABLE)"
+name: "Lab 02"
 
 on:
   pull_request_target:
