@@ -1,0 +1,33 @@
+# INTENTIONALLY VULNERABLE. Disposable training repositories only.
+# The upstream organization is excluded even if variables are accidentally set.
+name: "Lab 02 - Script injection (VULNERABLE)"
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+# This lab needs no API permissions or checkout, and exposes no explicit secrets.
+permissions: {}
+
+concurrency:
+  group: lab02-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  vulnerable-title:
+    if: >-
+      github.repository_owner != 'actions-security-playground' &&
+      vars.LAB02_ENABLED == 'true' &&
+      github.actor == vars.LAB_ATTACKER &&
+      startsWith(github.event.pull_request.title, 'lab-02:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Print PR title - intentionally unsafe interpolation
+        shell: bash
+        run: |
+          echo "Title: ${{ github.event.pull_request.title }}"
+      - name: Explain the training scope
+        run: |
+          printf '%s\n' 'Lab 02 executes untrusted PR text inside a shell script.'
+          printf '%s\n' 'Use only the harmless LAB_PWNED marker from the lab guide.'

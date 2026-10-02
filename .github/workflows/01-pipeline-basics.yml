@@ -1,0 +1,44 @@
+name: "Lab 01 - Pipeline basics"
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab01-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Show selected runner and event metadata
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          printf 'Event: %s\nRepository: %s\nRef: %s\nCommit: %s\n' \
+            "$EVENT_NAME" "$REPOSITORY" "$REF_NAME" "$COMMIT_SHA"
+          printf 'Runner OS: %s\n' "$RUNNER_OS"
+          python3 --version
+
+  test:
+    needs: inspect
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Test the sample application
+        run: python3 -m unittest discover -s tests -v
+      - name: Run the lab test script
+        run: bash scripts/lab-test.sh

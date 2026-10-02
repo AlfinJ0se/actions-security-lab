@@ -1,0 +1,46 @@
+# INTENTIONALLY VULNERABLE. Disposable training repositories only.
+# No write-capable token, real credentials, artifacts, caches or deployments.
+name: "Lab 03 - Pwn request (VULNERABLE)"
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab03-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  vulnerable-test:
+    if: >-
+      github.repository_owner != 'actions-security-playground' &&
+      vars.LAB03_ENABLED == 'true' &&
+      github.actor == vars.LAB_ATTACKER &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      startsWith(github.event.pull_request.title, 'lab-03:')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Require the dummy repository secret
+        env:
+          LAB_SECRET: ${{ secrets.LAB_SECRET }}
+        run: |
+          if [ -z "$LAB_SECRET" ]; then
+            printf '%s\n' 'Create LAB_SECRET with a training-only dummy value in the base repository.'
+            exit 1
+          fi
+      - name: Checkout untrusted PR head - intentionally unsafe
+        # Historical checkout version deliberately pinned for this legacy lab.
+        # Modern checkout versions add fork-PR protections; do not downgrade production CI.
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Execute the PR-controlled test script with a dummy secret
+        env:
+          LAB_SECRET: ${{ secrets.LAB_SECRET }}
+        run: bash scripts/lab-test.sh
