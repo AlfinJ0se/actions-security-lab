@@ -3,3 +3,4 @@ mode: enforce
 allow:
   - api.github.com
   - release-assets.githubusercontent.com
+  - pypi.org
