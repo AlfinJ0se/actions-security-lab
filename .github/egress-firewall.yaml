@@ -1,0 +1,5 @@
+# GitHub Actions native egress firewall policy.
+mode: enforce
+allow:
+  - api.github.com
+  - release-assets.githubusercontent.com

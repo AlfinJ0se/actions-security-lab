@@ -1,0 +1,15 @@
+name: Test native egress firewall
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  egress:
+    runs-on: ubuntu-24.04-firewall
+    steps:
+      - name: Allowed GitHub API request
+        run: curl --fail --silent --show-error https://api.github.com
+      - name: Blocked PyPI dependency lookup
+        run: curl --fail --silent --show-error https://pypi.org/simple/requests/
