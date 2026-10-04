@@ -1,4 +1,4 @@
-# INTENTIONALLY VULNERABLE: training only. Use dummy secrets.
+
 name: "Lab 03"
 
 on:
