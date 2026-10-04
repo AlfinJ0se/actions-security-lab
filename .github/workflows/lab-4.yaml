@@ -1,0 +1,99 @@
+# Place this file at .github/workflows/lab-4.yaml.
+# Scan this workflow with your GitHub Actions SBOM generator.
+# The actions below declare real transitive dependencies in action.yml/action.yaml.
+# This workflow is the input to that scan; it does not generate an Actions SBOM.
+# No application files or user-configured secrets are required.
+#
+# Verified action dependency relationships (2026-10-04):
+# aquasecurity/trivy-action@v0.35.0 -> aquasecurity/setup-trivy@v0.2.4
+# aquasecurity/trivy-action@v0.35.0 -> actions/cache@v4.2.4
+# aquasecurity/setup-trivy@v0.2.4 -> actions/cache@v4.2.4, actions/checkout@v5.0.0
+# hynek/setup-cached-uv@v2 -> actions/cache@v6.1.0, gacts/run-and-post-run@v1.4.4
+# subosito/flutter-action@v2.18.0 -> actions/cache@v4 (two call sites)
+# Upstream manifests pin several of these dependencies by SHA; version names
+# above are the corresponding upstream comments. Resolve refs during your scan.
+# Follow uses recursively and retain parent-child edges in the SBOM.
+# The upstream tags can move. This is a demonstration fixture.
+
+name: Lab 4 - Nested Actions SBOM Demo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-toolchain:
+    name: Python tooling - uv and cache helpers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Both transitive actions are enabled by the inputs below.
+      - name: Install uv and configure its cache
+        uses: hynek/setup-cached-uv@v2
+        with:
+          cache-dependency-path: .github/workflows/lab-4.yaml
+          use-cache-if: 'true'
+          prune-cache: 'true'
+
+      - name: Check uv installation
+        run: uv --version
+
+  flutter-toolchain:
+    name: Flutter tooling - SDK and package caches
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # Calls actions/cache separately for the Flutter SDK and the pub cache.
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.18.0
+        with:
+          flutter-version: '3.24.5'
+          channel: stable
+          cache: 'true'
+
+      - name: Check Flutter installation
+        run: flutter --version
+
+  security-scan:
+    name: Trivy - composite action inside a composite action
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # setup-trivy is transitive here; it is not a direct workflow step.
+      # Its own checkout step runs on a Trivy binary cache miss.
+      - name: Scan repository configuration
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: misconfig
+          format: json
+          output: trivy-results.json
+          exit-code: '0'
+          cache: 'true'
+          skip-dirs: .git,.cache
+
+      - name: Upload Trivy scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: trivy-results.json
+          if-no-files-found: error
+          retention-days: 7
