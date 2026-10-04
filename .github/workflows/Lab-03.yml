@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Checkout PR code
-        # Historical pin for demonstrating the legacy vulnerability, not production use.
+
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
