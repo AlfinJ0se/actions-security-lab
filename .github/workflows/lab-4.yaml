@@ -1,21 +1,5 @@
-# Place this file at .github/workflows/lab-4.yaml.
-# Scan this workflow with your GitHub Actions SBOM generator.
-# The actions below declare real transitive dependencies in action.yml/action.yaml.
-# This workflow is the input to that scan; it does not generate an Actions SBOM.
-# No application files or user-configured secrets are required.
-#
-# Verified action dependency relationships (2026-10-04):
-# aquasecurity/trivy-action@v0.35.0 -> aquasecurity/setup-trivy@v0.2.4
-# aquasecurity/trivy-action@v0.35.0 -> actions/cache@v4.2.4
-# aquasecurity/setup-trivy@v0.2.4 -> actions/cache@v4.2.4, actions/checkout@v5.0.0
-# hynek/setup-cached-uv@v2 -> actions/cache@v6.1.0, gacts/run-and-post-run@v1.4.4
-# subosito/flutter-action@v2.18.0 -> actions/cache@v4 (two call sites)
-# Upstream manifests pin several of these dependencies by SHA; version names
-# above are the corresponding upstream comments. Resolve refs during your scan.
-# Follow uses recursively and retain parent-child edges in the SBOM.
-# The upstream tags can move. This is a demonstration fixture.
 
-name: Lab 4 - Nested Actions SBOM Demo
+name: Lab 4 - Nested Actions SBOM 
 
 on:
   workflow_dispatch:
